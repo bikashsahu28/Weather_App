@@ -37,9 +37,9 @@ export const weatherService = {
   },
 
   // Get weather forecast
-  getWeatherForecast: async (location, days = 5) => {
+  getWeatherForecast: async (location, days = 7) => {
     try {
-      const response = await fetch(`${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(location)}&days=${days}&aqi=no`);
+      const response = await fetch(`${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(location)}&days=${days}&aqi=yes&alerts=yes`);
       
       if (!response.ok) {
         throw new Error('Weather forecast not found');
@@ -48,6 +48,21 @@ export const weatherService = {
       return await response.json();
     } catch (error) {
       throw new Error(error.message || 'Failed to fetch weather forecast');
+    }
+  },
+
+  // Get hourly forecast for specific date
+  getHourlyForecast: async (location, date) => {
+    try {
+      const response = await fetch(`${BASE_URL}/forecast.json?key=${API_KEY}&q=${encodeURIComponent(location)}&dt=${date}&aqi=no`);
+      
+      if (!response.ok) {
+        throw new Error('Hourly forecast not found');
+      }
+      
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch hourly forecast');
     }
   },
 

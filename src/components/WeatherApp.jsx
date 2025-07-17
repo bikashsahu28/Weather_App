@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SearchBar from './SearchBar.jsx';
 import CurrentWeather from './CurrentWeather.jsx';
 import WeatherForecast from './WeatherForecast.jsx';
+import Calendar from './Calendar.jsx';
+import HourlyForecast from './HourlyForecast.jsx';
 import LoadingSpinner from './LoadingSpinner.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
 import { Cloud, Sun, Moon, CloudRain } from 'lucide-react';
@@ -11,6 +13,9 @@ const WeatherApp = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedUnit, setSelectedUnit] = useState('C');
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDayData, setSelectedDayData] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
 
   const API_KEY = 'b763c6d2020f4f5ca7645813251707';
   const BASE_URL = 'https://api.weatherapi.com/v1';
@@ -66,6 +71,28 @@ const WeatherApp = () => {
     fetchWeatherData('Bhubaneswar');
   }, []);
 
+  // Handle day selection from forecast
+  const handleDaySelect = (date, dayData) => {
+    setSelectedDate(date);
+    setSelectedDayData(dayData);
+  };
+
+  // Handle calendar date selection
+  const handleCalendarDateSelect = (date) => {
+    setSelectedDate(date);
+    if (weatherData) {
+      const dayData = weatherData.forecast.forecastday.find(
+        day => new Date(day.date).toDateString() === date.toDateString()
+      );
+      setSelectedDayData(dayData);
+    }
+  };
+
+  // Get available dates for calendar
+  const getAvailableDates = () => {
+    if (!weatherData) return [];
+    return weatherData.forecast.forecastday.map(day => day.date);
+  };
   return (
     <div className={`min-h-screen bg-gradient-to-br ${getBackgroundGradient()} transition-all duration-1000 relative overflow-hidden`}>
       {/* Animated background elements */}
@@ -121,12 +148,31 @@ const WeatherApp = () => {
             <WeatherForecast 
               forecastData={weatherData.forecast.forecastday}
               selectedUnit={selectedUnit}
+              onDaySelect={handleDaySelect}
+              selectedDate={selectedDate}
             />
+
+            {/* Calendar and Hourly Forecast */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Calendar */}
+              <Calendar
+                onDateSelect={handleCalendarDateSelect}
+                selectedDate={selectedDate}
+                availableDates={getAvailableDates()}
+              />
+
+              {/* Hourly Forecast */}
+              <HourlyForecast
+                hourlyData={selectedDayData?.hour}
+                selectedUnit={selectedUnit}
+                selectedDate={selectedDate}
+              />
+            </div>
 
             {/* Footer */}
             <div className="text-center pt-8 pb-4">
               <p className="text-blue-200 text-sm font-light">
-                Powered by WeatherAPI • Last updated: {new Date().toLocaleTimeString()}
+                Powered by BikashApps • Last updated: {new Date().toLocaleTimeString()}
               </p>
             </div>
           </div>

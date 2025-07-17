@@ -2,7 +2,7 @@ import React from 'react';
 import WeatherIcon from './WeatherIcon.jsx';
 import { CloudRain, Wind, Droplets } from 'lucide-react';
 
-const WeatherForecast = ({ forecastData, selectedUnit }) => {
+const WeatherForecast = ({ forecastData, selectedUnit, onDaySelect, selectedDate }) => {
   // Format date
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
@@ -35,10 +35,19 @@ const WeatherForecast = ({ forecastData, selectedUnit }) => {
           {forecastData.map((day, index) => (
             <div 
               key={index} 
-              className="group relative bg-white bg-opacity-5 hover:bg-opacity-10 rounded-2xl p-6 text-center text-white transition-all duration-300 hover:scale-105 hover:shadow-xl border border-white border-opacity-10 backdrop-blur-sm"
+              className={`group relative bg-white rounded-2xl p-6 text-center text-white transition-all duration-300 hover:scale-105 hover:shadow-xl border backdrop-blur-sm cursor-pointer ${
+                selectedDate && selectedDate.toDateString() === new Date(day.date).toDateString()
+                  ? 'bg-opacity-20 border-blue-400 border-opacity-50 shadow-lg'
+                  : 'bg-opacity-5 hover:bg-opacity-10 border-white border-opacity-10'
+              }`}
+              onClick={() => onDaySelect && onDaySelect(new Date(day.date), day)}
             >
               {/* Hover effect background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-400 from-opacity-0 to-purple-400 to-opacity-0 group-hover:from-opacity-10 group-hover:to-opacity-5 rounded-2xl transition-all duration-300"></div>
+              <div className={`absolute inset-0 bg-gradient-to-br rounded-2xl transition-all duration-300 ${
+                selectedDate && selectedDate.toDateString() === new Date(day.date).toDateString()
+                  ? 'from-blue-400 from-opacity-10 to-purple-400 to-opacity-5'
+                  : 'from-blue-400 from-opacity-0 to-purple-400 to-opacity-0 group-hover:from-opacity-10 group-hover:to-opacity-5'
+              }`}></div>
               
               <div className="relative z-10">
                 {/* Date */}
@@ -107,7 +116,7 @@ const WeatherForecast = ({ forecastData, selectedUnit }) => {
         {/* Additional forecast info */}
         <div className="mt-8 pt-6 border-t border-white border-opacity-10">
           <p className="text-center text-blue-200 text-sm font-light">
-            Tap any day for detailed hourly forecast • Data updates every hour
+            Click any day for detailed hourly forecast • Data updates every hour
           </p>
         </div>
       </div>
